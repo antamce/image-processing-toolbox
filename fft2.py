@@ -1,44 +1,44 @@
-def fft2_calc(image_name, colourmap=cv2.COLORMAP_JET):
+def fft2_calc(image_name, colourmap=2):
 
     import numpy as np
     from libtiff import TIFF
     import skimage
     import cv2
 
+    colourmap_codes = { 0 : cv2.COLORMAP_AUTUMN,
+                        1 : cv2.COLORMAP_BONE,
+                        2 : cv2.COLORMAP_JET,
+                        3 : cv2.COLORMAP_WINTER,
+                        4 : cv2.COLORMAP_RAINBOW,
+                        5 : cv2.COLORMAP_OCEAN,
+                        6 : cv2.COLORMAP_SUMMER,
+                        7 : cv2.COLORMAP_SPRING,
+                        8 : cv2.COLORMAP_COOL,
+                        9 : cv2.COLORMAP_HSV,
+                        10 : cv2.COLORMAP_PINK,
+                        11 : cv2.COLORMAP_HOT,
+                        12  : cv2.COLORMAP_PARULA,
+                        13 : cv2.COLORMAP_MAGMA,
+                        14 : cv2.COLORMAP_INFERNO,
+                        15 : cv2.COLORMAP_PLASMA,
+                        16 : cv2.COLORMAP_VIRIDIS,
+                        17 : cv2.COLORMAP_CIVIDIS,
+                        18 : cv2.COLORMAP_TWILIGHT,
+                        19 : cv2.COLORMAP_TWILIGHT_SHIFTED,
+                        20 : cv2.COLORMAP_TURBO,
+                        21 : cv2.COLORMAP_DEEPGREEN}
 
-    tif = TIFF.open(image_name+'.tif', mode='r')
+
+    tif = TIFF.open(image_name, mode='r')
     for i in tif.iter_images():
         fourier = cv2.dft(np.float32(i), flags=cv2.DFT_COMPLEX_OUTPUT)
         fourier_shift = np.fft.fftshift(fourier)
         magnitude = 20*np.log(cv2.magnitude(fourier_shift[:,:,0],fourier_shift[:,:,1]))
         magnitude = cv2.normalize(magnitude, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8UC1)
-        imC = cv2.applyColorMap(magnitude, colourmap)
+        imC = cv2.applyColorMap(magnitude, colourmap_codes[colourmap])
         cv2.imwrite('fourier.tiff', imC)
     tif.close()
-    '''
-  cv::COLORMAP_AUTUMN = 0 ,
-  cv::COLORMAP_BONE = 1 ,
-  cv::COLORMAP_JET = 2 ,
-  cv::COLORMAP_WINTER = 3 ,
-  cv::COLORMAP_RAINBOW = 4 ,
-  cv::COLORMAP_OCEAN = 5 ,
-  cv::COLORMAP_SUMMER = 6 ,
-  cv::COLORMAP_SPRING = 7 ,
-  cv::COLORMAP_COOL = 8 ,
-  cv::COLORMAP_HSV = 9 ,
-  cv::COLORMAP_PINK = 10 ,
-  cv::COLORMAP_HOT = 11 ,
-  cv::COLORMAP_PARULA = 12 ,
-  cv::COLORMAP_MAGMA = 13 ,
-  cv::COLORMAP_INFERNO = 14 ,
-  cv::COLORMAP_PLASMA = 15 ,
-  cv::COLORMAP_VIRIDIS = 16 ,
-  cv::COLORMAP_CIVIDIS = 17 ,
-  cv::COLORMAP_TWILIGHT = 18 ,
-  cv::COLORMAP_TWILIGHT_SHIFTED = 19 ,
-  cv::COLORMAP_TURBO = 20 ,
-  cv::COLORMAP_DEEPGREEN = 21 
-    '''
+
 
 
  

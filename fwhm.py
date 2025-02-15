@@ -13,7 +13,7 @@ def calculate_fwhm(file_path, gaussian_blur=5, binarization_threshold=0.7, erode
 
 
     tif = TIFF.open(file_path, mode='r')
-    df1 = pd.DataFrame()
+    
     contours_array = []
 
     for n, img in enumerate(tif.iter_images()): 
@@ -43,17 +43,13 @@ def calculate_fwhm(file_path, gaussian_blur=5, binarization_threshold=0.7, erode
                 lineim = cv2.line(img.copy(), (x, y+h-1), (x+w-1, y), (255, 255, 255), 2)
                 line = np.transpose(np.array(draw.line(x, y+h-1, x+w-1, y)))
                 data = img[line[:, 1], line[:, 0]]
-                if save:
-                    df1[f'cont{n}'] = pd.Series(signal.resample((data), resampling_rate))
-                else: 
-                    contours_array.append(signal.resample((data), resampling_rate))
+                contours_array.append(signal.resample((data), resampling_rate))
     ndcont = np.array(contours_array)
-    if save:            
-        mean,std=norm.fit(df1.mean(axis=1))
-    else:
-         mean,std=norm.fit(ndcont.mean(axis=1))
+    
+    mean,std=norm.fit(ndcont.mean(axis=1))
     
     if save:
+        df1 = pd.DataFrame(ndcont)
         df1['mean'] = df1.mean(axis=1)
         df1['fit'] = pd.Series([mean, std])
         df1.to_excel('output.xlsx')
