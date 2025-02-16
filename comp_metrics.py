@@ -1,4 +1,4 @@
-def calculate_comp_metrics(image_1_path, image_2_path, colourmap_ssim=2, colourmap_rse=2, save_path=''):
+def calculate_comp_metrics(image_1_path, image_2_path, save_path, colourmap_ssim=2, colourmap_rse=2):
 
     '''
     returns global ssim and rmse
@@ -6,7 +6,7 @@ def calculate_comp_metrics(image_1_path, image_2_path, colourmap_ssim=2, colourm
     '''
 
     from skimage.metrics import structural_similarity
-    from libtiff import TIFF
+    from reslice_tif import reslice_image
     import cv2
     import numpy as np
     from scipy import stats
@@ -34,30 +34,26 @@ def calculate_comp_metrics(image_1_path, image_2_path, colourmap_ssim=2, colourm
                         20 : cv2.COLORMAP_TURBO,
                         21 : cv2.COLORMAP_DEEPGREEN}
 
-    tif = TIFF.open(image_1_path, mode='r')
-    tif2 = TIFF.open(image_2_path, mode='r')
-    for i in tif.iter_images():
-        img = np.array(i)
-    for j in tif2.iter_images():
-        img2 = np.array(j)
+    filename_1 = image_1_path.split('\\')[-1].split('.')[0]
+    filename_2 = image_2_path.split('\\')[-1].split('.')[0]
+    img1 = reslice_image(image_1_path)[0]
+    img2 = reslice_image(image_2_path)[0]
     
-    (score, diff) = structural_similarity(img, img2, full=True)
+    (ssim, diff) = structural_similarity(img1, img2, full=True)
     diff = cv2.normalize(diff, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8UC1)
     imC = cv2.applyColorMap(diff, colourmap_codes[colourmap_ssim])
-    cv2.imwrite(save_path+'\\ssim.tiff', imC)
+    cv2.imwrite(save_path+f'\\{filename_1}_to_{filename_2}_ssim.tiff', imC)
     
     
-    RSE_map = np.sqrt(np.square(np.subtract(img,img2)))
+    RSE_map = np.sqrt(np.square(np.subtract(img1,img2)))
     
     RSE_map = cv2.normalize(RSE_map.astype('int32'), None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8UC1)
     RSE_map = cv2.applyColorMap(RSE_map, colourmap_codes[colourmap_rse])
-    cv2.imwrite(save_path+'\\rse_map.tiff', RSE_map)
-
-    RMSE = np.sqrt(np.square(np.subtract(img,img2)).mean())
-    print(np.subtract(img,img2).mean())
+    cv2.imwrite(save_path+f'\\{filename_1}_to_{filename_2}_rse_map.tiff', RSE_map)
+    
+    RMSE = np.sqrt(np.square(np.subtract(img1,img2)).mean())
+    
     #pearsoncorr = np.sum(img-img.mean()+ img2-img2.mean())/np.sqrt(np.sum(np.square(img-img.mean()))*np.sum(np.square(img2-img2.mean())))
     
-    tif.close()
-    tif2.close()
-    return score, RMSE
+    return ssim, RMSE
     

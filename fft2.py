@@ -1,8 +1,6 @@
-def fft2_calc(image_name, colourmap=2):
+def fft2_calc(image_arr, filename, output_path, colourmap=2):
 
     import numpy as np
-    from libtiff import TIFF
-    import skimage
     import cv2
 
     colourmap_codes = { 0 : cv2.COLORMAP_AUTUMN,
@@ -29,15 +27,14 @@ def fft2_calc(image_name, colourmap=2):
                         21 : cv2.COLORMAP_DEEPGREEN}
 
 
-    tif = TIFF.open(image_name, mode='r')
-    for i in tif.iter_images():
-        fourier = cv2.dft(np.float32(i), flags=cv2.DFT_COMPLEX_OUTPUT)
-        fourier_shift = np.fft.fftshift(fourier)
-        magnitude = 20*np.log(cv2.magnitude(fourier_shift[:,:,0],fourier_shift[:,:,1]))
-        magnitude = cv2.normalize(magnitude, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8UC1)
-        imC = cv2.applyColorMap(magnitude, colourmap_codes[colourmap])
-        cv2.imwrite('fourier.tiff', imC)
-    tif.close()
+    
+    fourier = cv2.dft(np.float32(image_arr), flags=cv2.DFT_COMPLEX_OUTPUT)
+    fourier_shift = np.fft.fftshift(fourier)
+    magnitude = 20*np.log(cv2.magnitude(fourier_shift[:,:,0],fourier_shift[:,:,1]))
+    magnitude = cv2.normalize(magnitude, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8UC1)
+    imC = cv2.applyColorMap(magnitude, colourmap_codes[colourmap])
+    cv2.imwrite(f'{output_path}\\{filename}_fourier.tiff', imC)
+    
 
 
 
