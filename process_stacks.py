@@ -1,5 +1,4 @@
 import numpy as np
-from libtiff import TIFF
 from reslice_tif import reslice_image
 import pandas as pd
 from decorr import apodize, getDcorr
@@ -31,7 +30,7 @@ def calculate_stack_metrics(path, pixel_size, z_step, output_path):
     #TODO um well at least something
     df = pd.DataFrame(resolution_arr)
     df.columns = ['Resolution XY', 'Resolution XZ', 'Resolution YZ', 'SNR XY', 'SNR XZ', 'SNR YZ']
-    df.replace(to_replace=0, value=np.NaN, inplace=True)
+    df.replace(to_replace=0, value=np.nan, inplace=True)
     df['Resolution XY'].dropna(inplace=True)
     df['Resolution XZ'].dropna(inplace=True)
     df['Resolution YZ'].dropna(inplace=True)
@@ -62,7 +61,7 @@ def calculate_fwhm_stack(path, pixel_size, z_step, output_path):
                 fwhm_arr[m, n] = (z_step*std)
     
     df = pd.DataFrame(fwhm_arr)
-    df.replace(to_replace=0, value=np.NaN, inplace=True)
+    df.replace(to_replace=0, value=np.nan, inplace=True)
     df.columns = ['xy', 'xz', 'yz']
     df['xy'].dropna(inplace=True)
     df['xz'].dropna(inplace=True)

@@ -1,28 +1,30 @@
 import numpy as np
-from libtiff import TIFF
+import tifffile as tiff
+
 
 def reslice_image(path, save=False, output_path=''):
     
-    tif = TIFF.open(path, mode='r')
-    reslice_arr = []
-    for i in tif.iter_images():
-        reslice_arr.append(i)
-
-    imarray = np.array(reslice_arr)
-    xz_reslice = imarray.transpose(1, 0, 2)
-    yz_reslice = imarray.transpose(2, 0, 1)
-    tif.close()
+    tif = tiff.imread(path)
+ 
+    xz_reslice = tif.transpose(1, 0, 2)
+    yz_reslice = tif.transpose(2, 0, 1)
+    
 
     if save:
 
-        import skimage
-        import os
 
         filename = path.split('\\')[-1]
         filename = filename.split('.')[0]
-        skimage.io.imsave(f"'{output_path}\\{filename}_xz.tif", xz_reslice)
-        skimage.io.imsave(f"'{output_path}\\{filename}_yz.tif", yz_reslice)
-        os.replace(f"'{output_path}\\{filename}.tif", f"{filename}_xy.tif")
+						
+        with tiff.TiffWriter(f"{output_path}\\{filename}_xz.tif") as stack_1:
+            stack_1.write(xz_reslice, contiguous=True)
+
+        with tiff.TiffWriter(f"{output_path}\\{filename}_yz.tif") as stack_2:
+            stack_2.write(yz_reslice, contiguous=True)
+        
+        with tiff.TiffWriter(f"{output_path}\\{filename}_xy.tif") as stack_3:
+            stack_3.write(tif, contiguous=True)
+
     
-    return imarray, xz_reslice, yz_reslice
+    return tif, xz_reslice, yz_reslice
     

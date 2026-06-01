@@ -1,7 +1,7 @@
 '''
 This function is based on "Descloux, A., K. S. Grußmayer, and A. Radenovic. "Parameter-free image 
-% resolution estimation based on decorrelation analysis."
-% Nature methods (2019): 1-7." , where a detailed description of the method can be found
+resolution estimation based on decorrelation analysis."
+Nature methods (2019): 1-7." , where a detailed description of the method can be found
 
 '''
 import numpy as np
